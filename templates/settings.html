@@ -1,0 +1,479 @@
+<!doctype html>
+<html>
+<head>
+<!-- Required meta tags -->
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- Bootstrap CSS -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.rtl.min.css" rel="stylesheet" integrity="sha384-dpuaG1suU0eT09tx5plTaGMLBsfDLzUCCUXOY2j/LSvXYuG6Bqs43ALlhIqAJVRb" crossorigin="anonymous">
+
+<title>Pawsible - Settings</title>
+</head>
+
+<body>
+  <style>
+    .custom-navbar 
+    {
+        background-color: #F7F7E9;
+        position: relative;
+        z-index: 1000;
+    }
+    .vertical-nav 
+    {
+        position: fixed;
+        top: 10px;
+        left: 0;
+        height: calc(120vh - 90px);
+        width: 240px;
+        background-color: #5b2a09;
+        z-index: 100;
+    }
+    .vertical-nav .nav-link 
+    {
+        color: #ffffff;
+        font-size: 1.7rem;
+        padding: 50px 10px;
+        text-align: left;
+        margin-left:-45px; 
+        margin-top:0px;   
+    }
+    .vertical-nav .nav-link:hover 
+    {
+        background-color: #331603;
+    }
+    body 
+    {
+      background: #C2B8A3;
+      margin: 0;
+      padding: 0;
+    }
+    .main-content {
+        margin-left: 260px;
+        margin-top: 20px;
+        margin-right: 30px;
+        padding: 20px;
+    }
+    .settings-card {
+        background: white;
+        border: 2px solid #5B2A09;
+        border-radius: 8px;
+        padding: 25px;
+        margin-bottom: 20px;
+    }
+    .settings-card h4 {
+        color: #5B2A09;
+        margin-bottom: 20px;
+        border-bottom: 2px solid #5B2A09;
+        padding-bottom: 10px;
+    }
+    .btn-save {
+        background-color: #5B2A09;
+        color: white;
+        border: none;
+        padding: 10px 30px;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+    .btn-save:hover {
+        background-color: #331603;
+    }
+    .btn-feedback {
+        background-color: #28a745;
+        color: white;
+        border: none;
+        padding: 10px 30px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 16px;
+    }
+    .btn-feedback:hover {
+        background-color: #218838;
+    }
+    .btn-danger-custom {
+        background-color: #dc3545;
+        color: white;
+        border: none;
+        padding: 10px 30px;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+    .btn-danger-custom:hover {
+        background-color: #c82333;
+    }
+    .form-label {
+        color: #5B2A09;
+        font-weight: 600;
+        margin-top: 15px;
+    }
+    .success-message {
+        background: #d4edda;
+        border: 1px solid #c3e6cb;
+        color: #155724;
+        padding: 10px;
+        border-radius: 5px;
+        margin-bottom: 15px;
+        display: none;
+    }
+    .error-message {
+        background: #f8d7da;
+        border: 1px solid #f5c6cb;
+        color: #721c24;
+        padding: 10px;
+        border-radius: 5px;
+        margin-bottom: 15px;
+        display: none;
+    }
+  </style>
+
+  <nav class="navbar navbar-expand-lg custom-navbar p-3">
+    <div class="container-fluid">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <li class="nav-item">
+          <a class="nav-link active" aria-current="page" style="color:#5B2A09;" href="http://127.0.0.1:8000/settings">Settings</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" style="color:#5B2A09;" href="#" onclick="handleLogout()">Logout</a>
+        </li>
+      </ul>
+      <form class="d-flex" role="search">
+        <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+        <button class="btn btn-outline-success" style="color:#5B2A09;" type="submit">Search</button>
+      </form>
+    </div>
+  </nav>
+  
+  <img src="../static/img/PawsibleIcon.jpg" width="80" height="70" style="position:absolute; margin-left:80px; top:2px; z-index: 1001;">
+
+  <nav class="navbar navbar-expand-lg vertical-nav">
+    <div class="container-fluid flex-column">
+        <ul class="navbar-nav flex-column">
+            <li class="nav-item">
+                <a class="nav-link" href="http://127.0.0.1:8000/dashboard">Dashboard</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="http://127.0.0.1:8000/documents">Documents</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="http://127.0.0.1:8000/schedules">Schedules</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="http://127.0.0.1:8000/comingsoon">Vet Details</a>
+            </li>
+        </ul>
+    </div>
+  </nav>
+
+  <div class="main-content">
+    <h1 style="color: #5B2A09; margin-bottom: 30px;">Account Settings</h1>
+
+    <!-- Account Information -->
+    <div class="settings-card">
+      <h4>Account Information</h4>
+      <div id="accountSuccessMsg" class="success-message"></div>
+      <div id="accountErrorMsg" class="error-message"></div>
+      
+      <div class="mb-3">
+        <label for="currentEmail" class="form-label">Current Email</label>
+        <input type="email" class="form-control" id="currentEmail" readonly>
+      </div>
+      
+      <div class="mb-3">
+        <label for="newEmail" class="form-label">New Email (optional)</label>
+        <input type="email" class="form-control" id="newEmail" placeholder="Enter new email">
+        <small class="text-muted">Leave blank to keep current email</small>
+      </div>
+      
+      <button class="btn-save" onclick="updateEmail()">Update Email</button>
+    </div>
+
+    <!-- Change Password -->
+    <div class="settings-card">
+      <h4>Change Password</h4>
+      <div id="passwordSuccessMsg" class="success-message"></div>
+      <div id="passwordErrorMsg" class="error-message"></div>
+      
+      <div class="mb-3">
+        <label for="currentPassword" class="form-label">Current Password</label>
+        <input type="password" class="form-control" id="currentPassword" placeholder="Enter current password">
+      </div>
+      
+      <div class="mb-3">
+        <label for="newPassword" class="form-label">New Password</label>
+        <input type="password" class="form-control" id="newPassword" placeholder="Enter new password">
+        <small class="text-muted">Must be at least 6 characters</small>
+      </div>
+      
+      <div class="mb-3">
+        <label for="confirmNewPassword" class="form-label">Confirm New Password</label>
+        <input type="password" class="form-control" id="confirmNewPassword" placeholder="Confirm new password">
+      </div>
+      
+      <button class="btn-save" onclick="changePassword()">Change Password</button>
+    </div>
+
+    <!-- Notification Preferences -->
+    <div class="settings-card">
+      <h4>Notification Preferences</h4>
+      <div id="notificationSuccessMsg" class="success-message"></div>
+      
+      <div class="form-check mb-3">
+        <input class="form-check-input" type="checkbox" id="emailNotifications" checked>
+        <label class="form-check-label" for="emailNotifications">
+          Email notifications for upcoming appointments
+        </label>
+      </div>
+      
+      <div class="form-check mb-3">
+        <input class="form-check-input" type="checkbox" id="vaccineReminders" checked>
+        <label class="form-check-label" for="vaccineReminders">
+          Vaccination reminders
+        </label>
+      </div>
+      
+      <div class="form-check mb-3">
+        <input class="form-check-input" type="checkbox" id="documentAlerts" checked>
+        <label class="form-check-label" for="documentAlerts">
+          Document upload confirmations
+        </label>
+      </div>
+      
+      <button class="btn-save" onclick="saveNotificationPreferences()">Save Preferences</button>
+    </div>
+
+    <!-- Feedback Section -->
+    <div class="settings-card">
+      <h4>Feedback & Support</h4>
+      <p style="color: #5B2A09;">We value your feedback! Help us improve Pawsible by sharing your thoughts and suggestions.</p>
+      
+      <button class="btn-feedback" onclick="openFeedbackForm()">
+        📝 Submit Feedback
+      </button>
+    </div>
+
+    <!-- Delete Account -->
+    <div class="settings-card">
+      <h4>Danger Zone</h4>
+      <p style="color: #721c24;">Warning: This action cannot be undone. All your pet data will be permanently deleted.</p>
+      
+      <button class="btn-danger-custom" onclick="confirmDeleteAccount()">Delete Account</button>
+    </div>
+  </div>
+
+  <script>
+    // ⭐ PASTE YOUR GOOGLE FORM LINK HERE ⭐
+    const GOOGLE_FORM_URL = 'https://docs.google.com/forms/d/e/1FAIpQLSd1U38nyVKnLioHU9u_qCyxq1KLmOJicsy-cJvZoUHFV70W-g/viewform?usp=sharing&ouid=115676194068553264122';
+    // Replace 'https://forms.gle/YOUR_FORM_ID_HERE' with your actual Google Form link
+    
+    function openFeedbackForm() {
+      window.open(GOOGLE_FORM_URL, '_blank');
+    }
+    
+    // Load current user email when page loads
+    window.addEventListener('load', async () => {
+      await loadUserInfo();
+      loadNotificationPreferences();
+    });
+
+    async function loadUserInfo() {
+      try {
+        const response = await fetch('http://127.0.0.1:8000/api/user/info', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          }
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          document.getElementById('currentEmail').value = data.email;
+        }
+      } catch (error) {
+        console.error('Error loading user info:', error);
+      }
+    }
+
+    async function updateEmail() {
+      const newEmail = document.getElementById('newEmail').value.trim();
+      const successMsg = document.getElementById('accountSuccessMsg');
+      const errorMsg = document.getElementById('accountErrorMsg');
+      
+      successMsg.style.display = 'none';
+      errorMsg.style.display = 'none';
+
+      if (!newEmail) {
+        errorMsg.textContent = 'Please enter a new email address';
+        errorMsg.style.display = 'block';
+        return;
+      }
+
+      if (!newEmail.includes('@')) {
+        errorMsg.textContent = 'Please enter a valid email address';
+        errorMsg.style.display = 'block';
+        return;
+      }
+
+      try {
+        const response = await fetch('http://127.0.0.1:8000/api/user/update-email', {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ new_email: newEmail })
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          successMsg.textContent = 'Email updated successfully!';
+          successMsg.style.display = 'block';
+          document.getElementById('currentEmail').value = newEmail;
+          document.getElementById('newEmail').value = '';
+        } else {
+          errorMsg.textContent = data.error || 'Failed to update email';
+          errorMsg.style.display = 'block';
+        }
+      } catch (error) {
+        errorMsg.textContent = 'Error connecting to server';
+        errorMsg.style.display = 'block';
+      }
+    }
+
+    async function changePassword() {
+      const currentPassword = document.getElementById('currentPassword').value;
+      const newPassword = document.getElementById('newPassword').value;
+      const confirmPassword = document.getElementById('confirmNewPassword').value;
+      const successMsg = document.getElementById('passwordSuccessMsg');
+      const errorMsg = document.getElementById('passwordErrorMsg');
+      
+      successMsg.style.display = 'none';
+      errorMsg.style.display = 'none';
+
+      if (!currentPassword || !newPassword || !confirmPassword) {
+        errorMsg.textContent = 'Please fill in all password fields';
+        errorMsg.style.display = 'block';
+        return;
+      }
+
+      if (newPassword.length < 6) {
+        errorMsg.textContent = 'New password must be at least 6 characters';
+        errorMsg.style.display = 'block';
+        return;
+      }
+
+      if (newPassword !== confirmPassword) {
+        errorMsg.textContent = 'New passwords do not match';
+        errorMsg.style.display = 'block';
+        return;
+      }
+
+      try {
+        const response = await fetch('http://127.0.0.1:8000/api/user/change-password', {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            current_password: currentPassword,
+            new_password: newPassword
+          })
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          successMsg.textContent = 'Password changed successfully!';
+          successMsg.style.display = 'block';
+          document.getElementById('currentPassword').value = '';
+          document.getElementById('newPassword').value = '';
+          document.getElementById('confirmNewPassword').value = '';
+        } else {
+          errorMsg.textContent = data.error || 'Failed to change password';
+          errorMsg.style.display = 'block';
+        }
+      } catch (error) {
+        errorMsg.textContent = 'Error connecting to server';
+        errorMsg.style.display = 'block';
+      }
+    }
+
+    function loadNotificationPreferences() {
+      // Load from localStorage or use defaults
+      const emailNotif = localStorage.getItem('emailNotifications') !== 'false';
+      const vaccineRem = localStorage.getItem('vaccineReminders') !== 'false';
+      const docAlerts = localStorage.getItem('documentAlerts') !== 'false';
+      
+      document.getElementById('emailNotifications').checked = emailNotif;
+      document.getElementById('vaccineReminders').checked = vaccineRem;
+      document.getElementById('documentAlerts').checked = docAlerts;
+    }
+
+    function saveNotificationPreferences() {
+      const emailNotif = document.getElementById('emailNotifications').checked;
+      const vaccineRem = document.getElementById('vaccineReminders').checked;
+      const docAlerts = document.getElementById('documentAlerts').checked;
+      
+      localStorage.setItem('emailNotifications', emailNotif);
+      localStorage.setItem('vaccineReminders', vaccineRem);
+      localStorage.setItem('documentAlerts', docAlerts);
+      
+      const successMsg = document.getElementById('notificationSuccessMsg');
+      successMsg.textContent = 'Notification preferences saved!';
+      successMsg.style.display = 'block';
+      
+      setTimeout(() => {
+        successMsg.style.display = 'none';
+      }, 3000);
+    }
+
+    async function confirmDeleteAccount() {
+      const confirmation = confirm('Are you absolutely sure you want to delete your account? This will permanently delete all your pets, documents, and schedules. This action cannot be undone.');
+      
+      if (!confirmation) return;
+      
+      const doubleConfirm = prompt('Type "DELETE" to confirm account deletion:');
+      
+      if (doubleConfirm !== 'DELETE') {
+        alert('Account deletion cancelled');
+        return;
+      }
+
+      try {
+        const response = await fetch('http://127.0.0.1:8000/api/user/delete-account', {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+          }
+        });
+
+        if (response.ok) {
+          alert('Your account has been deleted');
+          window.location.href = 'http://127.0.0.1:8000/';
+        } else {
+          const data = await response.json();
+          alert('Error: ' + data.error);
+        }
+      } catch (error) {
+        alert('Error connecting to server');
+      }
+    }
+
+    async function handleLogout() {
+      try {
+        await fetch('http://127.0.0.1:8000/api/logout', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          }
+        });
+        window.location.href = 'http://127.0.0.1:8000/login';
+      } catch (error) {
+        console.error('Logout error:', error);
+        window.location.href = 'http://127.0.0.1:8000/login';
+      }
+    }
+  </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+</body>
+</html>

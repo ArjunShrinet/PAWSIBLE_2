@@ -1,0 +1,302 @@
+<!doctype html>
+<html>
+<head>
+<!-- Required meta tags -->
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- Bootstrap CSS -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.rtl.min.css" rel="stylesheet" integrity="sha384-dpuaG1suU0eT09tx5plTaGMLBsfDLzUCCUXOY2j/LSvXYuG6Bqs43ALlhIqAJVRb" crossorigin="anonymous">
+
+<title>Pawsible</title>
+
+</head>
+<body>
+    <nav class="navbar navbar-expand">
+        <div class="container-fluid">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+              <li class="nav-item">
+                <a class="nav-link active" aria-current="page" style="color:rgb(255, 255, 255);" href="http://127.0.0.1:8000" >Home</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" style="color:rgb(255, 255, 255);" href="http://127.0.0.1:8000/info" >About Us</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" style="color:rgb(255, 255, 255);" href="#" onclick="showLogin()">Login</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" style="color:rgb(255, 255, 255);" href="#" onclick="showSignup()">Sign Up</a>
+              </li>
+            </ul>
+            <form class="d-flex" role="search">
+              <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+              <button class="btn btn-outline-success" style="color:rgb(255, 255, 255);" type="submit">Search</button>
+            </form>
+        </div>
+    </nav>
+    
+    <img src="../static/img/PawsibleIcon.jpg" width="550" height="550" style="position:absolute; margin-left:100px; margin-top:90px;" alt="Pawsible Icon"></img>
+
+    <!-- Login Form -->
+    <div class="container" id="loginContainer">
+        <div class="mx-5 my-5" style="text-align: right;">
+            <br><br><br>
+            <h1 style="color:rgb(249, 234, 234);">Login:</h1>
+            <br><br>
+            <label for="loginEmail" style="color:rgb(255, 255, 255);" class="form-label">Email address</label>
+            <br>
+            <input type="email" class="form-control" id="loginEmail" style="width: 30%; text-align: right; float: right;" placeholder="name@example.com">
+            <div id="emailHelpBlock" class="form-text" style="text-align: right;"></div>
+            
+            <br><br><br>
+            
+            <div class="mx-0" style="text-align: right;">
+                <label for="loginPassword" style="color:rgb(255, 255, 255);" class="form-label">Password</label>
+                <br>
+                <input type="password" id="loginPassword" class="form-control" style="width: 30%; text-align: right; float: right;" aria-describedby="passwordHelpBlock">
+                <div id="passwordHelpBlock" class="form-text" style="text-align: right;"></div>
+            </div>
+            
+            <br><br>
+            
+            <div class="col-auto my-3" style="text-align: right;">
+                <button type="submit" class="btn btn-primary mb-3" onclick="handleLogin()">Login</button>
+                <br>
+                <a href="#" style="color:rgb(255, 255, 255);" onclick="showSignup()">Don't have an account? Sign Up</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Signup Form -->
+    <div class="container" id="signupContainer" style="display: none;">
+        <div class="mx-5 my-5" style="text-align: right;">
+            <br><br><br>
+            <h1 style="color:rgb(249, 234, 234);">Sign Up:</h1>
+            <br><br>
+            <div style="display: flex; flex-direction: column; align-items: end;">
+                <label for="signupEmail" style="color:rgb(255, 255, 255);" class="form-label">Email address</label>
+                <br>
+                <input type="email" class="form-control" id="signupEmail" style="width: 30%; text-align: right; float: right;" placeholder="name@example.com">
+                <div id="signupEmailHelp" class="form-text" style="text-align: right; color: rgb(255, 255, 255);font-weight: bold   ;"></div>
+            </div>
+            
+            <br><br><br>
+            
+            <div class="mx-0" style="text-align: right; display: flex; flex-direction: column; align-items: end;">
+                <label for="signupPassword" style="color:rgb(255, 255, 255);" class="form-label">Password</label>
+                <br>
+                <input type="password" id="signupPassword" class="form-control" style="width: 30%; text-align: right; float: right;">
+                <div id="signupPasswordHelp" class="form-text" style="text-align: right;margin-top: 5px; color: rgb(255, 255, 255);font-weight: bold;"></div>
+            </div>
+            
+            <br><br><br>
+            
+            <div class="mx-0" style="text-align: right; display: flex; flex-direction: column; align-items: end;">
+                <label for="confirmPassword" style="color:rgb(255, 255, 255);" class="form-label">Confirm Password</label>
+                <br>
+                <input type="password" id="confirmPassword" class="form-control" style="width: 30%; text-align: right; float: right;">
+                <div id="confirmPasswordHelp" class="form-text" style="text-align: right; color: rgb(255, 255, 255);font-weight: bold; "></div>
+            </div>
+            
+            <br><br>
+            
+            <div class="col-auto my-3" style="text-align: right;">
+                <button type="submit" class="btn btn-success mb-3" onclick="handleSignup()">Sign Up</button>
+                <br>
+                <a href="#" style="color:rgb(255, 255, 255);" onclick="showLogin()">Already have an account? Login</a>
+            </div>
+        </div>
+    </div>
+
+
+    
+    <script>
+        // In-memory user storage (will persist during the session)
+        let users = {
+            'admin': 'admin' // Default admin account
+        };
+        
+        let currentUser = null;
+
+        function showLogin() {
+            document.getElementById('loginContainer').style.display = 'block';
+            document.getElementById('signupContainer').style.display = 'none';
+            document.getElementById('dashboardContainer').style.display = 'none';
+            clearLoginForm();
+        }
+
+        function showSignup() {
+            document.getElementById('loginContainer').style.display = 'none';
+            document.getElementById('signupContainer').style.display = 'flex';
+            document.getElementById('signupContainer').style.flexDirection = 'column';
+            // document.getElementById('signupContainer').style.gap = '.2rem';
+            document.getElementById('dashboardContainer').style.display = 'none';
+            clearSignupForm();
+        }
+
+        function showDashboard() {
+            // Redirect to dashboard.html
+            window.location.href = 'dashboard.html';
+        }
+
+        function showAbout() {
+            alert('About Us page - Add your about content here!');
+        }
+
+        function clearLoginForm() {
+            document.getElementById('loginEmail').value = '';
+            document.getElementById('loginPassword').value = '';
+        }
+
+        function clearSignupForm() {
+            document.getElementById('signupEmail').value = '';
+            document.getElementById('signupPassword').value = '';
+            document.getElementById('confirmPassword').value = '';
+            document.getElementById('signupEmailHelp').textContent = '';
+            document.getElementById('signupPasswordHelp').textContent = '';
+            document.getElementById('confirmPasswordHelp').textContent = '';
+        }
+
+        async function handleLogin() {
+            const email = document.getElementById('loginEmail').value.trim();
+            const password = document.getElementById('loginPassword').value;
+
+            if (!email || !password) {
+                alert('Please fill in all fields.');
+                return;
+            }
+
+            try {
+                const response = await fetch('http://127.0.0.1:8000/api/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        email: email,
+                        password: password
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (response.ok) {
+                    alert('Login successful! Welcome ' + email);
+                    window.location.href = 'http://127.0.0.1:8000/dashboard';
+                } else {
+                    alert('Login failed: ' + data.error);
+                }
+            } catch (error) {
+                alert('Error connecting to server: ' + error.message);
+            }
+        }
+
+        async function handleSignup() {
+            const email = document.getElementById('signupEmail').value.trim();
+            const password = document.getElementById('signupPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+
+            // Clear previous error messages
+            document.getElementById('signupEmailHelp').textContent = '';
+            document.getElementById('signupPasswordHelp').textContent = '';
+            document.getElementById('confirmPasswordHelp').textContent = '';
+
+            // Validation
+            let isValid = true;
+
+            if (!email) {
+                document.getElementById('signupEmailHelp').textContent = 'Email is required.';
+                isValid = false;
+            } else if (!email.includes('@')) {
+                document.getElementById('signupEmailHelp').textContent = 'Please enter a valid email address.';
+                isValid = false;
+            }
+
+            if (!password) {
+                document.getElementById('signupPasswordHelp').textContent = 'Password is required.';
+                isValid = false;
+            } else if (password.length < 6) {
+                document.getElementById('signupPasswordHelp').textContent = 'Password must be at least 6 characters.';
+                isValid = false;
+            }
+
+            if (!confirmPassword) {
+                document.getElementById('confirmPasswordHelp').textContent = 'Please confirm your password.';
+                isValid = false;
+            } else if (password !== confirmPassword) {
+                document.getElementById('confirmPasswordHelp').textContent = 'Passwords do not match.';
+                isValid = false;
+            }
+
+            if (!isValid) {
+                return;
+            }
+
+            try {
+                const response = await fetch('http://127.0.0.1:8000/api/signup', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        email: email,
+                        password: password
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (response.ok) {
+                    alert('Registration successful! You can now login with your credentials.');
+                    showLogin();
+                } else {
+                    document.getElementById('signupEmailHelp').textContent = data.error;
+                }
+            } catch (error) {
+                alert('Error connecting to server: ' + error.message);
+            }
+        }
+
+        async function handleLogout() {
+            try {
+                await fetch('http://127.0.0.1:8000/api/logout', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                });
+                alert('You have been logged out.');
+                window.location.href = 'http://127.0.0.1:8000/login';
+            } catch (error) {
+                console.error('Logout error:', error);
+            }
+        }
+
+        // Allow Enter key to submit forms
+        document.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                if (document.getElementById('loginContainer').style.display !== 'none') {
+                    handleLogin();
+                } else if (document.getElementById('signupContainer').style.display !== 'none') {
+                    handleSignup();
+                }
+            }
+        });
+    </script>
+    
+    
+  <style>
+    body 
+    {
+      background: blue;
+      background: linear-gradient(to right, #F7F7E9 50% , #5B2A09 50%);
+    }
+  </style>
+
+  <!-- Optional JavaScript; choose one of the two! -->
+
+  <!-- Option 1: Bootstrap Bundle with Popper -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+
+  </body>
+</html>

@@ -1,0 +1,511 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.rtl.min.css" rel="stylesheet" integrity="sha384-dpuaG1suU0eT09tx5plTaGMLBsfDLzUCCUXOY2j/LSvXYuG6Bqs43ALlhIqAJVRb" crossorigin="anonymous">
+<title>Pawsible - Schedules</title>
+<style>
+    body {
+        background: #C2B8A3;
+        margin: 0;
+        padding: 0;
+        font-family: Arial, sans-serif;
+    }
+    .custom-navbar {
+        background-color: #F7F7E9;
+        position: relative;
+        z-index: 1000;
+    }
+    .vertical-nav {
+        position: fixed;
+        top: 20px;
+        left: 0;
+        height: calc(120vh - 90px);
+        width: 240px;
+        background-color: #5b2a09;
+        z-index: 100;
+    }
+    .vertical-nav .nav-link {
+        color: #ffffff;
+        font-size: 1.7rem;
+        padding: 50px 10px;
+        text-align: left;
+        margin-left: -45px;
+    }
+    .vertical-nav .nav-link:hover {
+        background-color: #331603;
+    }
+    .main-content {
+        margin-left: 260px;
+        margin-top: 20px;
+        margin-right: 30px;
+        padding: 20px;
+    }
+    .calendar-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        border: 2px solid #5B2A09;
+        margin-bottom: 20px;
+    }
+    .schedule-card {
+        background: white;
+        border-left: 4px solid #5B2A09;
+        border-radius: 8px;
+        padding: 15px;
+        margin: 10px 0;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+    .schedule-card:hover {
+        transform: translateX(5px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    }
+    .schedule-card.vet { border-left-color: #dc3545; }
+    .schedule-card.grooming { border-left-color: #0dcaf0; }
+    .schedule-card.medication { border-left-color: #ffc107; }
+    .schedule-card.other { border-left-color: #198754; }
+    .add-schedule-btn {
+        position: fixed;
+        bottom: 30px;
+        right: 30px;
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background: #5B2A09;
+        color: white;
+        border: none;
+        font-size: 30px;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        cursor: pointer;
+        z-index: 999;
+    }
+    .add-schedule-btn:hover {
+        background: #331603;
+        transform: scale(1.1);
+    }
+    .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.5);
+        z-index: 2000;
+        overflow-y: auto;
+    }
+    .modal-content {
+        background: white;
+        margin: 50px auto;
+        padding: 30px;
+        border-radius: 10px;
+        max-width: 600px;
+        position: relative;
+    }
+    .close-modal {
+        position: absolute;
+        top: 15px;
+        right: 20px;
+        font-size: 30px;
+        cursor: pointer;
+        color: #666;
+    }
+    .close-modal:hover {
+        color: #000;
+    }
+    .type-badge {
+        display: inline-block;
+        padding: 5px 10px;
+        border-radius: 5px;
+        font-size: 12px;
+        font-weight: bold;
+        margin-right: 10px;
+    }
+    .type-badge.vet { background: #dc3545; color: white; }
+    .type-badge.grooming { background: #0dcaf0; color: white; }
+    .type-badge.medication { background: #ffc107; color: black; }
+    .type-badge.other { background: #198754; color: white; }
+    .upcoming-section {
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        border: 2px solid #5B2A09;
+        margin-bottom: 20px;
+    }
+    .filter-buttons {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+    }
+    .filter-btn {
+        padding: 8px 16px;
+        border: 2px solid #5B2A09;
+        background: white;
+        color: #5B2A09;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+    .filter-btn:hover, .filter-btn.active {
+        background: #5B2A09;
+        color: white;
+    }
+    .no-pets-message {
+        background: #fff3cd;
+        border: 2px solid #ffc107;
+        padding: 30px;
+        border-radius: 8px;
+        text-align: center;
+    }
+</style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg custom-navbar p-3">
+        <div class="container-fluid">
+            <div style="flex-grow: 1;"></div>
+            <ul class="navbar-nav mb-2 mb-lg-0" style="flex-direction: row; gap: 20px;">
+                <li class="nav-item">
+                    <a class="nav-link" style="color:#5B2A09;" href="http://127.0.0.1:8000/settings">Settings</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" style="color:#5B2A09;" href="#" onclick="handleLogout()">Logout</a>
+                </li>
+            </ul>
+            <form class="d-flex" role="search" style="margin-right: 0;">
+                <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+                <button class="btn btn-outline-success" style="color:#5B2A09; border-color:#5B2A09;" type="submit">Search</button>
+            </form>
+        </div>
+    </nav>
+
+    <img src="../static/img/PawsibleIcon.jpg" width="80" height="70" style="position:absolute; margin-left:80px; top:2px; z-index: 1001;">
+
+    <nav class="navbar navbar-expand-lg vertical-nav">
+        <div class="container-fluid flex-column">
+            <ul class="navbar-nav flex-column">
+                <li class="nav-item">
+                    <a class="nav-link" href="http://127.0.0.1:8000/dashboard">Dashboard</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="http://127.0.0.1:8000/documents">Documents</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="http://127.0.0.1:8000/schedules">Schedules</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="http://127.0.0.1:8000/comingsoon">Vet Details</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="main-content">
+        <h1 style="color: #5B2A09; margin-bottom: 30px;">Pet Schedules & Reminders</h1>
+
+        <div id="noPetsMessage" class="no-pets-message" style="display: none;">
+            <h3>No Pets Found</h3>
+            <p>Please add a pet in the Dashboard before creating schedules.</p>
+            <a href="http://127.0.0.1:8000/dashboard" class="btn btn-primary">Go to Dashboard</a>
+        </div>
+
+        <div id="scheduleSection" style="display: none;">
+            <div class="calendar-header">
+                <div>
+                    <h4 style="color: #5B2A09; margin: 0;">Today: <span id="currentDate"></span></h4>
+                </div>
+                <div>
+                    <select id="petFilter" class="form-select" style="width: 250px;" onchange="filterSchedules()">
+                        <option value="">All Pets</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="filter-buttons">
+                <button class="filter-btn active" data-filter="all" onclick="filterByType('all')">All</button>
+                <button class="filter-btn" data-filter="vet" onclick="filterByType('vet')">Vet Appointments</button>
+                <button class="filter-btn" data-filter="grooming" onclick="filterByType('grooming')">Grooming</button>
+                <button class="filter-btn" data-filter="medication" onclick="filterByType('medication')">Medication</button>
+                <button class="filter-btn" data-filter="other" onclick="filterByType('other')">Other</button>
+            </div>
+
+            <div class="upcoming-section">
+                <h4 style="color: #5B2A09; margin-bottom: 20px;">Upcoming Schedules</h4>
+                <div id="schedulesList"></div>
+            </div>
+        </div>
+    </div>
+
+    <button class="add-schedule-btn" onclick="openModal()" title="Add Schedule">+</button>
+
+    <!-- Add/Edit Schedule Modal -->
+    <div id="scheduleModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal()">&times;</span>
+            <h3 style="color: #5B2A09; margin-bottom: 20px;" id="modalTitle">Add Schedule</h3>
+            
+            <form id="scheduleForm">
+                <div class="mb-3">
+                    <label class="form-label">Select Pet *</label>
+                    <select id="modalPetSelect" class="form-select" required>
+                        <option value="">Choose a pet...</option>
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Schedule Type *</label>
+                    <select id="scheduleType" class="form-select" required>
+                        <option value="vet">Vet Appointment</option>
+                        <option value="grooming">Grooming</option>
+                        <option value="medication">Medication</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Title *</label>
+                    <input type="text" id="scheduleTitle" class="form-control" placeholder="e.g., Annual Checkup" required>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Date & Time *</label>
+                    <input type="datetime-local" id="scheduleDateTime" class="form-control" required>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Location</label>
+                    <input type="text" id="scheduleLocation" class="form-control" placeholder="e.g., City Vet Clinic">
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Notes</label>
+                    <textarea id="scheduleNotes" class="form-control" rows="3" placeholder="Additional information..."></textarea>
+                </div>
+
+                <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary" style="background: #5B2A09; border: none;">Save Schedule</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        let schedules = [];
+        let pets = [];
+        let currentFilter = 'all';
+        let currentPetFilter = '';
+
+        window.addEventListener('load', async () => {
+            updateCurrentDate();
+            await loadPets();
+        });
+
+        function updateCurrentDate() {
+            const today = new Date();
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            document.getElementById('currentDate').textContent = today.toLocaleDateString('en-US', options);
+        }
+
+        async function loadPets() {
+            try {
+                const response = await fetch('http://127.0.0.1:8000/api/pets', {
+                    method: 'GET',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    pets = data.pets;
+                    
+                    if (pets.length === 0) {
+                        document.getElementById('noPetsMessage').style.display = 'block';
+                        document.getElementById('scheduleSection').style.display = 'none';
+                    } else {
+                        document.getElementById('noPetsMessage').style.display = 'none';
+                        document.getElementById('scheduleSection').style.display = 'block';
+                        populatePetSelects();
+                        loadSchedules();
+                    }
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        function populatePetSelects() {
+            const petFilter = document.getElementById('petFilter');
+            const modalPetSelect = document.getElementById('modalPetSelect');
+            
+            pets.forEach(pet => {
+                const option1 = document.createElement('option');
+                option1.value = pet.id;
+                option1.textContent = pet.name;
+                petFilter.appendChild(option1);
+
+                const option2 = document.createElement('option');
+                option2.value = pet.id;
+                option2.textContent = pet.name;
+                modalPetSelect.appendChild(option2);
+            });
+        }
+
+        function loadSchedules() {
+            // Demo data - In production, load from backend
+            schedules = [
+                {
+                    id: 1,
+                    petId: pets[0]?.id,
+                    petName: pets[0]?.name,
+                    type: 'vet',
+                    title: 'Annual Checkup',
+                    dateTime: '2025-11-05T10:00',
+                    location: 'City Vet Clinic',
+                    notes: 'Bring vaccination records'
+                },
+                {
+                    id: 2,
+                    petId: pets[0]?.id,
+                    petName: pets[0]?.name,
+                    type: 'grooming',
+                    title: 'Grooming Session',
+                    dateTime: '2025-11-08T14:00',
+                    location: 'Pet Spa',
+                    notes: 'Full grooming package'
+                }
+            ];
+            
+            displaySchedules();
+        }
+
+        function displaySchedules() {
+            const container = document.getElementById('schedulesList');
+            container.innerHTML = '';
+
+            let filteredSchedules = schedules.filter(s => {
+                const typeMatch = currentFilter === 'all' || s.type === currentFilter;
+                const petMatch = !currentPetFilter || s.petId == currentPetFilter;
+                return typeMatch && petMatch;
+            });
+
+            filteredSchedules.sort((a, b) => new Date(a.dateTime) - new Date(b.dateTime));
+
+            if (filteredSchedules.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: #666; padding: 20px;">No schedules found. Click + to add one!</p>';
+                return;
+            }
+
+            filteredSchedules.forEach(schedule => {
+                const card = document.createElement('div');
+                card.className = `schedule-card ${schedule.type}`;
+                
+                const dateTime = new Date(schedule.dateTime);
+                const formattedDate = dateTime.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+                const formattedTime = dateTime.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+
+                card.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; align-items: start;">
+                        <div style="flex-grow: 1;">
+                            <span class="type-badge ${schedule.type}">${schedule.type.toUpperCase()}</span>
+                            <h5 style="margin: 10px 0 5px 0;">${schedule.title}</h5>
+                            <p style="margin: 5px 0; color: #666;">
+                                <strong>Pet:</strong> ${schedule.petName}<br>
+                                <strong>Date:</strong> ${formattedDate} at ${formattedTime}<br>
+                                ${schedule.location ? `<strong>Location:</strong> ${schedule.location}<br>` : ''}
+                                ${schedule.notes ? `<strong>Notes:</strong> ${schedule.notes}` : ''}
+                            </p>
+                        </div>
+                        <button class="btn btn-sm btn-danger" onclick="deleteSchedule(${schedule.id})">Delete</button>
+                    </div>
+                `;
+                
+                container.appendChild(card);
+            });
+        }
+
+        function filterByType(type) {
+            currentFilter = type;
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.dataset.filter === type) {
+                    btn.classList.add('active');
+                }
+            });
+            displaySchedules();
+        }
+
+        function filterSchedules() {
+            currentPetFilter = document.getElementById('petFilter').value;
+            displaySchedules();
+        }
+
+        function openModal() {
+            document.getElementById('scheduleModal').style.display = 'block';
+            document.getElementById('scheduleForm').reset();
+            document.getElementById('modalTitle').textContent = 'Add Schedule';
+        }
+
+        function closeModal() {
+            document.getElementById('scheduleModal').style.display = 'none';
+        }
+
+        document.getElementById('scheduleForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const petId = document.getElementById('modalPetSelect').value;
+            const pet = pets.find(p => p.id == petId);
+            
+            const newSchedule = {
+                id: schedules.length + 1,
+                petId: parseInt(petId),
+                petName: pet.name,
+                type: document.getElementById('scheduleType').value,
+                title: document.getElementById('scheduleTitle').value,
+                dateTime: document.getElementById('scheduleDateTime').value,
+                location: document.getElementById('scheduleLocation').value,
+                notes: document.getElementById('scheduleNotes').value
+            };
+            
+            schedules.push(newSchedule);
+            displaySchedules();
+            closeModal();
+            alert('Schedule added successfully!');
+        });
+
+        function deleteSchedule(id) {
+            if (confirm('Are you sure you want to delete this schedule?')) {
+                schedules = schedules.filter(s => s.id !== id);
+                displaySchedules();
+                alert('Schedule deleted successfully!');
+            }
+        }
+
+        async function handleLogout() {
+            try {
+                await fetch('http://127.0.0.1:8000/api/logout', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                window.location.href = 'http://127.0.0.1:8000/login';
+            } catch (error) {
+                window.location.href = 'http://127.0.0.1:8000/login';
+            }
+        }
+
+        window.onclick = (event) => {
+            const modal = document.getElementById('scheduleModal');
+            if (event.target === modal) {
+                closeModal();
+            }
+        };
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

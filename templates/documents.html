@@ -1,0 +1,438 @@
+<!doctype html>
+<html>
+<head>
+<!-- Required meta tags -->
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- Bootstrap CSS -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.rtl.min.css" rel="stylesheet" integrity="sha384-dpuaG1suU0eT09tx5plTaGMLBsfDLzUCCUXOY2j/LSvXYuG6Bqs43ALlhIqAJVRb" crossorigin="anonymous">
+
+<title>Pawsible - Documents</title>
+</head>
+
+<body>
+  <style>
+    .custom-navbar 
+    {
+        background-color: #F7F7E9;
+        position: relative;
+        z-index: 1000;
+    }
+  </style>
+  <nav class="navbar navbar-expand-lg custom-navbar p-3">
+    <div class="container-fluid">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <li class="nav-item">
+          <a class="nav-link active" aria-current="page" style="color:#5B2A09;" href="http://127.0.0.1:8000/settings">Settings</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" style="color:#5B2A09;" href="#" onclick="handleLogout()">Logout</a>
+        </li>
+      </ul>
+      <form class="d-flex" role="search">
+        <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+        <button class="btn btn-outline-success" style="color:#5B2A09;" type="submit">Search</button>
+      </form>
+    </div>
+  </nav>
+  
+  <img src="../static/img/PawsibleIcon.jpg" width="80" height="70" style="position:absolute; margin-left:80px; top:2px; z-index: 1001;">
+
+  <style>
+    .vertical-nav 
+    {
+        position: fixed;
+        top: 10px;
+        left: 0;
+        height: calc(120vh - 90px);
+        width: 240px;
+        background-color: #5b2a09;
+        z-index: 100;
+    }
+    .vertical-nav .nav-link 
+    {
+        color: #ffffff;
+        font-size: 1.7rem;
+        padding: 50px 10px;
+        text-align: left;
+        margin-left:-45px; 
+        margin-top:0px;
+    }
+    .vertical-nav .nav-link:hover 
+    {
+        background-color: #331603;
+    }
+    .main-content {
+        margin-left: 260px;
+        margin-top: 20px;
+        margin-right: 30px;
+        padding: 20px;
+    }
+    .document-card {
+        background: white;
+        border: 2px solid #5B2A09;
+        border-radius: 8px;
+        padding: 15px;
+        margin: 10px 0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+    .document-card:hover {
+        background: #f8f9fa;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    .document-info {
+        flex-grow: 1;
+    }
+    .document-icon {
+        width: 40px;
+        height: 40px;
+        margin-right: 15px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #5B2A09;
+        color: white;
+        border-radius: 5px;
+        font-weight: bold;
+        font-size: 12px;
+    }
+    .pet-selector {
+        background: white;
+        padding: 25px;
+        border-radius: 8px;
+        border: 2px solid #5B2A09;
+        margin-bottom: 25px;
+    }
+    .delete-doc-btn {
+        background: #dc3545;
+        color: white;
+        border: none;
+        padding: 8px 15px;
+        border-radius: 5px;
+        cursor: pointer;
+        margin-left: 10px;
+    }
+    .delete-doc-btn:hover {
+        background: #c82333;
+    }
+    .no-pets-message {
+        background: #fff3cd;
+        border: 2px solid #ffc107;
+        padding: 30px;
+        border-radius: 8px;
+        text-align: center;
+        margin-top: 50px;
+    }
+    .upload-section {
+        background: white;
+        padding: 25px;
+        border-radius: 8px;
+        border: 2px solid #5B2A09;
+        margin-bottom: 25px;
+    }
+    .documents-list-section {
+        background: white;
+        padding: 25px;
+        border-radius: 8px;
+        border: 2px solid #5B2A09;
+    }
+  </style>
+
+  <nav class="navbar navbar-expand-lg vertical-nav">
+    <div class="container-fluid flex-column">
+      <ul class="navbar-nav flex-column">
+        <li class="nav-item">
+          <a class="nav-link" href="http://127.0.0.1:8000/dashboard">Dashboard</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="http://127.0.0.1:8000/documents">Documents</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="http://127.0.0.1:8000/schedules">Schedules</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="http://127.0.0.1:8000/comingsoon">Vet Details</a>
+        </li>
+      </ul>
+    </div>
+  </nav>
+
+  <div class="main-content">
+    <h1 style="color: #5B2A09; margin-bottom: 30px;">Pet Documents</h1>
+
+    <div id="noPetsMessage" class="no-pets-message" style="display: none;">
+      <h3>No Pets Found</h3>
+      <p>Please add a pet in the Dashboard before uploading documents.</p>
+      <a href="http://127.0.0.1:8000/dashboard" class="btn btn-primary">Go to Dashboard</a>
+    </div>
+
+    <div id="documentSection" style="display: none;">
+      <!-- Pet Selection -->
+      <div class="pet-selector">
+        <h4 style="color: #5B2A09; margin-bottom: 15px;">Select Pet</h4>
+        <select id="petSelect" class="form-select" style="max-width: 500px;" onchange="loadDocuments()">
+          <option value="">Choose a pet...</option>
+        </select>
+      </div>
+
+      <!-- Upload Section -->
+      <div id="uploadSection" style="display: none;">
+        <div class="upload-section">
+          <h4 style="color: #5B2A09; margin-bottom: 15px;">Upload Document for <span id="selectedPetName"></span></h4>
+          <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+            <input type="file" id="documentFile" class="form-control" style="max-width: 500px;" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.txt">
+            <button class="btn btn-primary" onclick="uploadDocument()">Upload</button>
+          </div>
+          <small class="text-muted d-block mt-2">Allowed: PDF, DOC, DOCX, JPG, PNG, TXT</small>
+        </div>
+
+        <!-- Documents List -->
+        <div class="documents-list-section">
+          <h4 style="color: #5B2A09; margin-bottom: 15px;">Documents for <span id="petNameInList"></span></h4>
+          <div id="documentsList"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let currentPetId = null;
+
+    // Load pets when page loads
+    window.addEventListener('load', async () => {
+      await loadPets();
+    });
+
+    async function loadPets() {
+      try {
+        const response = await fetch('http://127.0.0.1:8000/api/documents/pets', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          }
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          const petSelect = document.getElementById('petSelect');
+          
+          if (data.pets.length === 0) {
+            document.getElementById('noPetsMessage').style.display = 'block';
+            document.getElementById('documentSection').style.display = 'none';
+          } else {
+            document.getElementById('noPetsMessage').style.display = 'none';
+            document.getElementById('documentSection').style.display = 'block';
+            
+            data.pets.forEach(pet => {
+              const option = document.createElement('option');
+              option.value = pet.id;
+              option.textContent = `${pet.name} (${pet.breed})`;
+              petSelect.appendChild(option);
+            });
+          }
+        } else {
+          alert('Error loading pets');
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        alert('Error connecting to server');
+      }
+    }
+
+    async function loadDocuments() {
+      const petSelect = document.getElementById('petSelect');
+      const petId = petSelect.value;
+
+      if (!petId) {
+        document.getElementById('uploadSection').style.display = 'none';
+        return;
+      }
+
+      currentPetId = petId;
+      const selectedPetName = petSelect.options[petSelect.selectedIndex].text.split(' (')[0];
+      
+      document.getElementById('selectedPetName').textContent = selectedPetName;
+      document.getElementById('petNameInList').textContent = selectedPetName;
+      document.getElementById('uploadSection').style.display = 'block';
+
+      try {
+        const response = await fetch(`http://127.0.0.1:8000/api/documents/pet/${petId}`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          }
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          displayDocuments(data.documents);
+        } else {
+          alert('Error loading documents');
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        alert('Error connecting to server');
+      }
+    }
+
+    function displayDocuments(documents) {
+      const documentsList = document.getElementById('documentsList');
+      documentsList.innerHTML = '';
+
+      if (documents.length === 0) {
+        documentsList.innerHTML = '<p style="color: #666; text-align: center; padding: 20px;">No documents uploaded yet.</p>';
+        return;
+      }
+
+      documents.forEach(doc => {
+        const card = document.createElement('div');
+        card.className = 'document-card';
+        
+        const iconDiv = document.createElement('div');
+        iconDiv.className = 'document-icon';
+        iconDiv.textContent = doc.file_type.toUpperCase();
+        
+        const infoDiv = document.createElement('div');
+        infoDiv.className = 'document-info';
+        infoDiv.innerHTML = `
+          <strong>${doc.original_filename}</strong><br>
+          <small style="color: #666;">Uploaded: ${doc.uploaded_at}</small>
+        `;
+        
+        const actionsDiv = document.createElement('div');
+        
+        const viewBtn = document.createElement('button');
+        viewBtn.className = 'btn btn-sm btn-primary';
+        viewBtn.textContent = 'View';
+        viewBtn.onclick = () => viewDocument(doc.filename);
+        
+        const deleteBtn = document.createElement('button');
+        deleteBtn.className = 'delete-doc-btn';
+        deleteBtn.textContent = 'Delete';
+        deleteBtn.onclick = (e) => {
+          e.stopPropagation();
+          deleteDocument(doc.id);
+        };
+        
+        actionsDiv.appendChild(viewBtn);
+        actionsDiv.appendChild(deleteBtn);
+        
+        card.appendChild(iconDiv);
+        card.appendChild(infoDiv);
+        card.appendChild(actionsDiv);
+        
+        // Click on card to view
+        card.onclick = (e) => {
+          if (e.target === card || e.target === infoDiv || e.target === iconDiv) {
+            viewDocument(doc.filename);
+          }
+        };
+        
+        documentsList.appendChild(card);
+      });
+    }
+
+    function viewDocument(filename) {
+      const url = `/static/uploads/documents/${filename}`;
+      window.open(url, '_blank');
+    }
+
+    async function uploadDocument() {
+      if (!currentPetId) {
+        alert('Please select a pet first');
+        return;
+      }
+
+      const fileInput = document.getElementById('documentFile');
+      const file = fileInput.files[0];
+
+      if (!file) {
+        alert('Please select a file to upload');
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append('pet_id', currentPetId);
+      formData.append('file', file);
+
+      try {
+        const response = await fetch('http://127.0.0.1:8000/api/documents', {
+          method: 'POST',
+          body: formData
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          alert('Document uploaded successfully!');
+          fileInput.value = '';
+          loadDocuments(); // Reload documents list
+        } else {
+          alert('Error: ' + data.error);
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        alert('Error connecting to server');
+      }
+    }
+
+    async function deleteDocument(docId) {
+      if (!confirm('Are you sure you want to delete this document?')) {
+        return;
+      }
+
+      try {
+        const response = await fetch(`http://127.0.0.1:8000/api/documents/${docId}`, {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+          }
+        });
+
+        if (response.ok) {
+          alert('Document deleted successfully!');
+          loadDocuments(); // Reload documents list
+        } else {
+          const data = await response.json();
+          alert('Error: ' + data.error);
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        alert('Error connecting to server');
+      }
+    }
+
+    async function handleLogout() {
+      try {
+        await fetch('http://127.0.0.1:8000/api/logout', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          }
+        });
+        window.location.href = 'http://127.0.0.1:8000/login';
+      } catch (error) {
+        console.error('Logout error:', error);
+        window.location.href = 'http://127.0.0.1:8000/login';
+      }
+    }
+  </script>
+
+  <style>
+    body 
+    {
+      background: #C2B8A3;
+      margin: 0;
+      padding: 0;
+    }
+  </style>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+</body>
+</html>
